@@ -29,7 +29,6 @@ fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     match args.command {
         Command::Tokenize { file } => {
-            // let mut tokens = Vec::new();
             let file_contents = fs::read_to_string(file).context("failed to read file")?;
             for c in file_contents.chars() {
                 match c {
@@ -39,12 +38,18 @@ fn main() -> anyhow::Result<()> {
                     ')' => {
                         println!("RIGHT_PAREN ) null");
                     }
+                    '{' => {
+                        println!("LEFT_BRACE {{ null");
+                    }
+                    '}' => {
+                        println!("RIGHT_BRACE }} null");
+                    }
                     _ => {
                         anyhow::bail!("Can't handle this char yet");
                     }
                 }
             }
-            /// End of file or empty file
+            // End of file or empty file
             println!("EOF  null")
         }
     }
