@@ -1,38 +1,53 @@
-use std::env;
 use std::fs;
-use std::io::{self, Write};
 use clap::{Parser, Subcommand};
+use anyhow::Context;
 
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
 struct Args {
-
+    /// Interpreter command
+    #[command(subcommand)]
+    command: Command,
 }
 
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    if args.len() < 3 {
-        writeln!(io::stderr(), "Usage: {} tokenize <filename>", args[0]).unwrap();
-        return;
+#[derive(Debug, Subcommand)]
+enum Command {
+    Tokenize {
+        file: String,
     }
+}
 
-    let command = &args[1];
-    let filename = &args[2];
+// #[derive(Debug)]
+// enum Token {
+//     EOF,
+//     LeftParen,
+//     RightParen,
+// }
 
-    match command.as_str() {
-        "tokenize" => {
-            let file_contents = fs::read_to_string(filename).unwrap_or_else(|_| {
-                writeln!(io::stderr(), "Failed to read file {}", filename).unwrap();
-                String::new()
-            });
 
-            if !file_contents.is_empty() {
-                panic!("Scanner not implemented");
-            } else {
-                println!("EOF  null"); // Placeholder, remove this line when implementing the scanner
+fn main() -> anyhow::Result<()> {
+    let args = Args::parse();
+    match args.command {
+        Command::Tokenize { file } => {
+            // let mut tokens = Vec::new();
+            let file_contents = fs::read_to_string(file).context("failed to read file")?;
+            for c in file_contents.chars() {
+                match c {
+                    '(' => {
+                        println!("LEFT_PAREN ( null");
+                    }
+                    ')' => {
+                        println!("RIGHT_PAREN ) null");
+                    }
+                    _ => {
+                        anyhow::bail!("Can't handle this char yet");
+                    }
+                }
             }
-        }
-        _ => {
-            writeln!(io::stderr(), "Unknown command: {}", command).unwrap();
-            return;
+            /// End of file or empty file
+            println!("EOF  null")
         }
     }
+    Ok(())
 }
+
