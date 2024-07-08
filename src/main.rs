@@ -44,6 +44,24 @@ fn main() -> anyhow::Result<()> {
                     '}' => {
                         println!("RIGHT_BRACE }} null");
                     }
+                    '*' => {
+                        println!("STAR * null");
+                    }
+                    '.' => {
+                        println!("DOT . null");
+                    }
+                    ',' => {
+                        println!("COMMA , null");
+                    }
+                    '+' => {
+                        println!("PLUS + null");
+                    }
+                    '-' => {
+                        println!("MINUS - null");
+                    }
+                    ';' => {
+                        println!("SEMICOLON ; null");
+                    }
                     _ => {
                         anyhow::bail!("Can't handle this char yet");
                     }
