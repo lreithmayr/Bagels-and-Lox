@@ -1,6 +1,8 @@
-use std::fs;
-use clap::{Parser, Subcommand};
 use anyhow::Context;
+use clap::{Parser, Subcommand};
+use std::fs;
+use thiserror::Error;
+use std::process::{exit, ExitCode};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -12,58 +14,61 @@ struct Args {
 
 #[derive(Debug, Subcommand)]
 enum Command {
-    Tokenize {
-        file: String,
-    }
+    Tokenize { file: String },
 }
 
-// #[derive(Debug)]
-// enum Token {
-//     EOF,
-//     LeftParen,
-//     RightParen,
+// #[derive(Error, Debug)]
+// enum ParseError {
+//     #[error()]
+//     UnexpectedCharacter {
+//         char: String
+//     }
 // }
 
-
-fn main() -> anyhow::Result<()> {
+fn main() {
     let args = Args::parse();
+    let mut code: i32 = 0;
     match args.command {
         Command::Tokenize { file } => {
-            let file_contents = fs::read_to_string(file).context("failed to read file")?;
-            for c in file_contents.chars() {
-                match c {
-                    '(' => {
-                        println!("LEFT_PAREN ( null");
-                    }
-                    ')' => {
-                        println!("RIGHT_PAREN ) null");
-                    }
-                    '{' => {
-                        println!("LEFT_BRACE {{ null");
-                    }
-                    '}' => {
-                        println!("RIGHT_BRACE }} null");
-                    }
-                    '*' => {
-                        println!("STAR * null");
-                    }
-                    '.' => {
-                        println!("DOT . null");
-                    }
-                    ',' => {
-                        println!("COMMA , null");
-                    }
-                    '+' => {
-                        println!("PLUS + null");
-                    }
-                    '-' => {
-                        println!("MINUS - null");
-                    }
-                    ';' => {
-                        println!("SEMICOLON ; null");
-                    }
-                    _ => {
-                        anyhow::bail!("Can't handle this char yet");
+            let file_contents = fs::read_to_string(file).unwrap();
+            for l in file_contents.lines().enumerate() {
+                for c in l.1.chars() {
+                    match c {
+                        '(' => {
+                            println!("LEFT_PAREN ( null");
+                        }
+                        ')' => {
+                            println!("RIGHT_PAREN ) null");
+                        }
+                        '{' => {
+                            println!("LEFT_BRACE {{ null");
+                        }
+                        '}' => {
+                            println!("RIGHT_BRACE }} null");
+                        }
+                        '*' => {
+                            println!("STAR * null");
+                        }
+                        '.' => {
+                            println!("DOT . null");
+                        }
+                        ',' => {
+                            println!("COMMA , null");
+                        }
+                        '+' => {
+                            println!("PLUS + null");
+                        }
+                        '-' => {
+                            println!("MINUS - null");
+                        }
+                        ';' => {
+                            println!("SEMICOLON ; null");
+                        }
+                        _ => {
+                            eprintln!("[line {}] Error: Unexpected character: {}", l.0 + 1, c);
+                            code = 65;
+                        }
+
                     }
                 }
             }
@@ -71,6 +76,5 @@ fn main() -> anyhow::Result<()> {
             println!("EOF  null")
         }
     }
-    Ok(())
+    exit(code)
 }
-
