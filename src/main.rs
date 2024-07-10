@@ -119,10 +119,24 @@ impl Lexer {
             if let Some(t) = Self::scan_char(c, &mut line_nr) {
                 match t.token_type {
                     TokenType::EQUAL if next_char == Some(&'=') => {
-                        tokens.push(Token::new( TokenType::EQUAL_EQUAL, String::from("=="), line_nr, ));
+                        tokens.push(Token::new(
+                            TokenType::EQUAL_EQUAL,
+                            String::from("=="),
+                            line_nr,
+                        ));
+                        // Skip the next character
                         f_iter.nth(0);
                     }
-                    _ => {tokens.push(t)}
+                    TokenType::BANG if next_char == Some(&'=') => {
+                        tokens.push(Token::new(
+                            TokenType::BANG_EQUAL,
+                            String::from("!="),
+                            line_nr,
+                        ));
+                        // Skip the next character
+                        f_iter.nth(0);
+                    }
+                    _ => tokens.push(t),
                 }
             }
         }
@@ -167,6 +181,7 @@ impl Lexer {
                 None
             }
             '=' => Some(Token::new(TokenType::EQUAL, String::from(c), *line_nr)),
+            '!' => Some(Token::new(TokenType::BANG, String::from(c), *line_nr)),
             _ => Some(Token::new(
                 TokenType::LEXICAL_ERROR,
                 String::from(c),
