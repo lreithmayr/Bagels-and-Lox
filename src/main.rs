@@ -136,6 +136,24 @@ impl Lexer {
                         // Skip the next character
                         f_iter.nth(0);
                     }
+                    TokenType::GREATER if next_char == Some(&'=') => {
+                        tokens.push(Token::new(
+                            TokenType::GREATER_EQUAL,
+                            String::from(">="),
+                            line_nr,
+                        ));
+                        // Skip the next character
+                        f_iter.nth(0);
+                    }
+                    TokenType::LESS if next_char == Some(&'=') => {
+                        tokens.push(Token::new(
+                            TokenType::LESS_EQUAL,
+                            String::from("<="),
+                            line_nr,
+                        ));
+                        // Skip the next character
+                        f_iter.nth(0);
+                    }
                     _ => tokens.push(t),
                 }
             }
@@ -182,6 +200,8 @@ impl Lexer {
             }
             '=' => Some(Token::new(TokenType::EQUAL, String::from(c), *line_nr)),
             '!' => Some(Token::new(TokenType::BANG, String::from(c), *line_nr)),
+            '<' => Some(Token::new(TokenType::LESS, String::from(c), *line_nr)),
+            '>' => Some(Token::new(TokenType::GREATER, String::from(c), *line_nr)),
             _ => Some(Token::new(
                 TokenType::LEXICAL_ERROR,
                 String::from(c),
