@@ -24,3 +24,6 @@ bytes = "1.6.0"                                  # helps manage buffers
 thiserror = "1.0.61"                             # error handling
 proc-macro2 = "1.0.86"
 clap = { version = "4.5.9", features = ["derive"] }
+strum = { version = "0.26.3" }
+strum_macros = "0.26.3"
+itertools = "0.13.0"
