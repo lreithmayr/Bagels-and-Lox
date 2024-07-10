@@ -154,6 +154,11 @@ impl Lexer {
                         // Skip the next character
                         f_iter.nth(0);
                     }
+                    TokenType::SLASH if next_char == Some(&'/') => {
+                        if !f_iter.any(|c| c == '\n') {
+                            f_iter.by_ref().last();
+                        }
+                    }
                     _ => tokens.push(t),
                 }
             }
@@ -202,6 +207,7 @@ impl Lexer {
             '!' => Some(Token::new(TokenType::BANG, String::from(c), *line_nr)),
             '<' => Some(Token::new(TokenType::LESS, String::from(c), *line_nr)),
             '>' => Some(Token::new(TokenType::GREATER, String::from(c), *line_nr)),
+            '/' => Some(Token::new(TokenType::SLASH, String::from(c), *line_nr)),
             _ => Some(Token::new(
                 TokenType::LEXICAL_ERROR,
                 String::from(c),
