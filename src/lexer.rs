@@ -125,21 +125,27 @@ impl Lexer {
         }
     }
 
-    fn print_lex(tokens: &mut [Token]) -> i32 {
+    fn print_lex(tokens: &mut Vec<Token>) -> i32 {
         let mut error_code: i32 = 0;
-        // tokens.sort();
-        // dbg!(&tokens);
-        tokens.iter().for_each(|t| {
-            if t.token_type == TokenType::LEXICAL_ERROR {
+
+        tokens
+            .iter()
+            .filter(|t| t.token_type == TokenType::LEXICAL_ERROR)
+            .for_each(|t| {
                 eprintln!(
                     "[line {}] Error: Unexpected character: {}",
                     t.line, t.lexeme
                 );
                 error_code = 65;
-            } else {
+            });
+
+        tokens
+            .iter()
+            .filter(|t| t.token_type != TokenType::LEXICAL_ERROR)
+            .for_each(|t| {
                 println!("{}", t);
-            }
-        });
+            });
+
         println!("EOF  null");
         error_code
     }
