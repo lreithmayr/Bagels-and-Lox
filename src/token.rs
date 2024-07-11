@@ -5,8 +5,9 @@ use strum_macros::Display;
 #[allow(non_camel_case_types, dead_code, clippy::upper_case_acronyms)]
 #[derive(Debug, Display, Eq, PartialEq, Ord, PartialOrd)]
 pub enum TokenType {
-    // Illegal Token
+    // Errors
     LEXICAL_ERROR, // Implemented
+    UNTERM_STR,
 
     // Single-character tokens.
     LEFT_PAREN,  // Implemented
@@ -30,6 +31,7 @@ pub enum TokenType {
     GREATER_EQUAL, // Implemented
     LESS,          // Implemented
     LESS_EQUAL,    // Implemented
+    QMARK,
 
     // Literals.
     IDENTIFIER,
@@ -61,6 +63,7 @@ pub enum TokenType {
 pub struct Token {
     pub token_type: TokenType,
     pub lexeme: String,
+    pub appendix: String,
     pub line: i32,
 }
 
@@ -71,16 +74,17 @@ impl Display for Token {
             "{} {} {}",
             self.token_type,
             self.lexeme,
-            String::from("null")
+            self.appendix,
         )
     }
 }
 
 impl Token {
-    pub fn new(token_type: TokenType, lexeme: String, line: i32) -> Self {
+    pub fn new(token_type: TokenType, lexeme: String, appendix:String, line: i32) -> Self {
         Self {
             token_type,
             lexeme,
+            appendix,
             line,
         }
     }

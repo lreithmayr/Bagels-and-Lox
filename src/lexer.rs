@@ -23,6 +23,7 @@ impl Lexer {
                         tokens.push(Token::new(
                             TokenType::EQUAL_EQUAL,
                             String::from("=="),
+                            String::from("null"),
                             self.line_nr,
                         ));
                         // Skip the next character
@@ -32,6 +33,7 @@ impl Lexer {
                         tokens.push(Token::new(
                             TokenType::BANG_EQUAL,
                             String::from("!="),
+                            String::from("null"),
                             self.line_nr,
                         ));
                         // Skip the next character
@@ -41,6 +43,7 @@ impl Lexer {
                         tokens.push(Token::new(
                             TokenType::GREATER_EQUAL,
                             String::from(">="),
+                            String::from("null"),
                             self.line_nr,
                         ));
                         // Skip the next character
@@ -50,6 +53,7 @@ impl Lexer {
                         tokens.push(Token::new(
                             TokenType::LESS_EQUAL,
                             String::from("<="),
+                            String::from("null"),
                             self.line_nr,
                         ));
                         // Skip the next character
@@ -63,6 +67,37 @@ impl Lexer {
                         // character
                         self.line_nr += 1;
                     }
+                    TokenType::QMARK => {
+                        let mut string = String::new();
+                        while let c = f_iter.next() {
+                            match c {
+                                Some(c) => {
+                                    if c == '"' {
+                                        let mut lexeme = string.clone();
+                                        lexeme.insert(0, '"');
+                                        lexeme.push('"');
+                                        tokens.push(Token::new(
+                                            TokenType::STRING,
+                                            lexeme,
+                                            string,
+                                            self.line_nr,
+                                        ));
+                                        break;
+                                    }
+                                    string.push(c);
+                                }
+                                None => {
+                                    tokens.push(Token::new(
+                                        TokenType::UNTERM_STR,
+                                        String::from(""),
+                                        String::from(""),
+                                        self.line_nr,
+                                    ));
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     _ => tokens.push(t),
                 }
             }
@@ -75,42 +110,99 @@ impl Lexer {
             '(' => Some(Token::new(
                 TokenType::LEFT_PAREN,
                 String::from(c),
+                String::from("null"),
                 self.line_nr,
             )),
             ')' => Some(Token::new(
                 TokenType::RIGHT_PAREN,
                 String::from(c),
+                String::from("null"),
                 self.line_nr,
             )),
             '{' => Some(Token::new(
                 TokenType::LEFT_BRACE,
                 String::from(c),
+                String::from("null"),
                 self.line_nr,
             )),
             '}' => Some(Token::new(
                 TokenType::RIGHT_BRACE,
                 String::from(c),
+                String::from("null"),
                 self.line_nr,
             )),
-            '*' => Some(Token::new(TokenType::STAR, String::from(c), self.line_nr)),
-            '.' => Some(Token::new(TokenType::DOT, String::from(c), self.line_nr)),
-            ',' => Some(Token::new(TokenType::COMMA, String::from(c), self.line_nr)),
-            '+' => Some(Token::new(TokenType::PLUS, String::from(c), self.line_nr)),
-            '-' => Some(Token::new(TokenType::MINUS, String::from(c), self.line_nr)),
+            '*' => Some(Token::new(
+                TokenType::STAR,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
+            '.' => Some(Token::new(
+                TokenType::DOT,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
+            ',' => Some(Token::new(
+                TokenType::COMMA,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
+            '+' => Some(Token::new(
+                TokenType::PLUS,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
+            '-' => Some(Token::new(
+                TokenType::MINUS,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
             ';' => Some(Token::new(
                 TokenType::SEMICOLON,
                 String::from(c),
+                String::from("null"),
                 self.line_nr,
             )),
-            '=' => Some(Token::new(TokenType::EQUAL, String::from(c), self.line_nr)),
-            '!' => Some(Token::new(TokenType::BANG, String::from(c), self.line_nr)),
-            '<' => Some(Token::new(TokenType::LESS, String::from(c), self.line_nr)),
+            '=' => Some(Token::new(
+                TokenType::EQUAL,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
+            '!' => Some(Token::new(
+                TokenType::BANG,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
+            '<' => Some(Token::new(
+                TokenType::LESS,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
             '>' => Some(Token::new(
                 TokenType::GREATER,
                 String::from(c),
+                String::from("null"),
                 self.line_nr,
             )),
-            '/' => Some(Token::new(TokenType::SLASH, String::from(c), self.line_nr)),
+            '/' => Some(Token::new(
+                TokenType::SLASH,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
+            '"' => Some(Token::new(
+                TokenType::QMARK,
+                String::from(c),
+                String::from("null"),
+                self.line_nr,
+            )),
             '\n' => {
                 self.line_nr += 1;
                 None
@@ -120,12 +212,13 @@ impl Lexer {
             _ => Some(Token::new(
                 TokenType::LEXICAL_ERROR,
                 String::from(c),
+                String::from("null"),
                 self.line_nr,
             )),
         }
     }
 
-    fn print_lex(tokens: &mut Vec<Token>) -> i32 {
+    fn print_lex(tokens: &mut [Token]) -> i32 {
         let mut error_code: i32 = 0;
 
         tokens
@@ -143,7 +236,12 @@ impl Lexer {
             .iter()
             .filter(|t| t.token_type != TokenType::LEXICAL_ERROR)
             .for_each(|t| {
-                println!("{}", t);
+                if t.token_type == TokenType::UNTERM_STR {
+                    eprintln!("[line {}] Error: Unterminated string.", t.line);
+                    error_code = 65;
+                } else {
+                    println!("{}", t);
+                }
             });
 
         println!("EOF  null");
